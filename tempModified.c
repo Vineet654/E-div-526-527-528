@@ -5,8 +5,6 @@
 #include<windows.h>
 
 #define MAX_USERS 100
-#define MAX_USERNAME_LENGTH 30
-#define MAX_PASSWORD_LENGTH 30
 #define DATABASE_FILE "user_database.txt"
 #define MAX 5
 #define INFINITY 9999
@@ -28,20 +26,28 @@ struct node
     int distance;
     struct node *next;
 };
-struct edge
-{
-    int src;
-    int dest;
-    int weight;
-};
 
-void readCity(FILE *,struct node *);
+// Function prototypes
+void readCity(FILE *, struct node *);
 void displayCity(struct node *);
+int comparePincode(const struct node *, const struct node *);
+int compareCityName(const struct node *, const struct node *);
+int comparePopulation(const struct node *, const struct node *);
+int compareCityCode(const struct node *, const struct node *);
+int compareNumHospitals(const struct node *, const struct node *);
+int compareNumPatients(const struct node *, const struct node *);
+int compareNumDoctors(const struct node *, const struct node *);
+
+void Dijkstra(int Graph[MAX][MAX], int n, int start, struct node *city);
+
+void merge(struct node arr[], int l, int m, int r, int (*cmp)(const struct node *, const struct node *));
+void mergeSort(struct node arr[], int l, int r, int (*cmp)(const struct node *, const struct node *));
+
 
 typedef struct
  {
-    char username[MAX_USERNAME_LENGTH];
-    char password[MAX_PASSWORD_LENGTH];
+    char username[30];
+    char password[30];
 } User;
 
 User users[MAX_USERS];
@@ -52,7 +58,7 @@ void saveUserToFile(User newUser)
     FILE *file = fopen(DATABASE_FILE, "a");
     if (file == NULL) {
         perror("Error opening file");
-        exit(EXIT_FAILURE);
+        exit(0);
     }
 
     fprintf(file, "%s %s\n", newUser.username, newUser.password);
@@ -100,8 +106,8 @@ int createUser()
 
 int loginUser()
 {
-    char username[MAX_USERNAME_LENGTH];
-    char password[MAX_PASSWORD_LENGTH];
+    char username[30];
+    char password[30];
 
     printf("Enter username: ");
     scanf("%s", username);
@@ -136,6 +142,9 @@ int loginUser()
 int main()
  {
     int flag,j,num;
+    int sortCh;
+    char fname[50];
+    int (*cmp)(const struct node *, const struct node *);
     FILE *file = fopen(DATABASE_FILE, "r");
     if (file != NULL)
     {
@@ -144,7 +153,7 @@ int main()
         fclose(file);
     }
             /*printf("Enter File name to copy data from:");
-    scanf("%s",file);*/
+    scanf("%s",fname);*/
     FILE *fp=fopen("demo.txt","r");
     if(fp==NULL)
     {
@@ -153,10 +162,19 @@ int main()
     }
 
     fscanf(fp,"%d",&num);
+
+    //structure of cities
     struct node city[num];
     for(int j=0;j<num;j++)
             readCity(fp,&city[j]);
 fclose(fp);
+struct node temp;
+temp=city[1];
+city[1]=city[3];
+city[3]=temp;
+temp=city[0];
+city[0]=city[4];
+city[4]=temp;
     int choice, choice2;
     while (1&&flag!=1)
     {
@@ -167,88 +185,126 @@ fclose(fp);
         printf("\t\t\t\t\t\tEnter your choice: ");
         scanf("%d", &choice);
 
-        switch (choice)
-         {
-            case 1:
-                createUser();
-                break;
-            case 2:
-                {
-                flag=loginUser();
+switch (choice)
+{
+    case 1:
+        createUser();
+        break;
+    case 2:
+    {
+        flag = loginUser();
 
-                        while(flag==1)
-                       {
-                         printf("\n1--display the details\n");//done
-                         printf("2--Find shortest path\n");//dijstra`s algorithm
-                         printf("3--Find minimum distance to cover different cities from a city\n");//kruskal
-                         printf("4--Sort cities according to no. of patients\n");// insertion or selection sort
-                         printf("5--Logout\n");
-                         //code of menu driven in ksrtc..!!
+        while (flag == 1)
+        {
+            printf("\n1--display the details\n"); //done
+            printf("2--Find shortest path\n");     //dijstra`s algorithm
+            printf("3--Find minimum distance to cover different cities from a city\n"); //kruskal
+            printf("4--Sort cities.\n");                                               // insertion or selection sort
+            printf("5--Logout\n");
+            //code of menu driven in ksrtc..!!
 
-                         printf("\nEnter your choice\n");
-                         scanf("%d",&choice2);
-                         switch(choice2)
-                         {
-                            case 1:printf("\n___________________________________________\n");
-                                            for(int j=0;j<num;j++)
-                                                    displayCity(&city[j]);
-                                                    break;
-                            case 2:
-                                 //printf("Enter graph: ");
-                                    int graph[5][5];
-                                   FILE* fp2=fopen("graph.txt","r");
-                                    for(int i=0;i<5;i++)
-                                    {
-                                      for(int j=0;j<5;j++)
-                                        fscanf(fp2,"%d",&graph[i][j]);
-                                    }
-                                    fclose(fp2);
-                                    printf("Enter the source node\n");
-                                    int source;
-                                    scanf("%d",&source);
-                                    Dijkstra(graph,5,source,&city);
-                                    break;
-                            case 3:
-                                   break;
-                            case 5:
-                                            printf("");
-                                            const WORD darkGreen = 2;
-                                            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-                                            SetConsoleTextAttribute(hConsole,darkGreen| FOREGROUND_INTENSITY);
-                                               printf("You are now logged out..!!\n");
-                                            // Reset the text color to default (you may want to do this after printing colored text)
-                                            SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            printf("\nEnter your choice\n");
+            scanf("%d", &choice2);
+            switch (choice2)
+            {
+                case 1:
+                    printf("\n___________________________________________\n");
+                    for (int j = 0; j < num; j++)
+                        displayCity(&city[j]);
+                    break;
+                case 2:
+                    printf("Enter graph file: ");
+                    scanf("%s", fname);
+                    int graph[5][5];
+                    FILE *fp2 = fopen(fname, "r");
+                    for (int i = 0; i < 5; i++)
+                    {
+                        for (int j = 0; j < 5; j++)
+                            fscanf(fp2, "%d", &graph[i][j]);
+                    }
+                    fclose(fp2);
+                    printf("Enter the source node\n");
+                    int source;
+                    scanf("%d", &source);
+                    Dijkstra(graph, 5, source, city);
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    printf("Sort cities based on:\n");
+                    printf("\t1. City Name\n");
+                    printf("\t2. Pincode\n");
+                    printf("\t3. Population\n");
+                    printf("\t4. Number of Hospitals\n");
+                    printf("\t5. Number of Patients\n");
+                    printf("\t6. Number of Doctors\n");
+                    printf("\t7. City Code\n");
 
+                    scanf("%d", &sortCh);
 
-                                   flag=0;
-                                   break;
-                            default:printf("Enter correct Choice\n");
-                                    break;
-                         }
-                       }
-                }
-                break;
-            case 3:                     printf("");
-                                            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-                                            SetConsoleTextAttribute(hConsole,FOREGROUND_BLUE|FOREGROUND_GREEN| FOREGROUND_INTENSITY);
-                                             printf("Thank you for using our app.\n");
-                                            // Reset the text color to default (you may want to do this after printing colored text)
-                                            SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-                exit(0);
-            default:
-                printf("");
-                HANDLE hConsole1 = GetStdHandle(STD_OUTPUT_HANDLE);
-                SetConsoleTextAttribute(hConsole1,FOREGROUND_RED| FOREGROUND_INTENSITY);
-                printf("Invalid choice. Please try again.\n");
-                // Reset the text color to default (you may want to do this after printing colored text)
-                SetConsoleTextAttribute(hConsole1, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+                    if (sortCh == 1)
+                        cmp = compareCityName;
+                    else if (sortCh == 2)
+                        cmp = comparePincode;
+                    else if (sortCh == 3)
+                        cmp = comparePopulation;
+                    else if (sortCh == 4)
+                        cmp = compareNumHospitals;
+                    else if (sortCh == 5)
+                        cmp = compareNumPatients;
+                    else if (sortCh == 6)
+                        cmp = compareNumDoctors;
+                    else if (sortCh == 7)
+                        cmp = compareCityCode;
+                    else
+                    {
+                        // Handle invalid choice
+                        printf("Invalid choice. Please choose a number between 1 and 7.\n");
+                    }
 
+                    mergeSort(city, 0, num - 1,cmp);
+                    break;
+                case 5:
+                    printf("");
+                    const WORD darkGreen = 2;
+                    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+                    SetConsoleTextAttribute(hConsole, darkGreen | FOREGROUND_INTENSITY);
+                    printf("You are now logged out..!!\n");
+                    // Reset the text color to default (you may want to do this after printing colored text)
+                    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+
+                    flag = 0;
+                    break;
+                default:
+                    printf("Enter correct Choice\n");
+                    break;
+            }
         }
     }
-
+    break;
+    case 3:
+        printf("");
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+        printf("Thank you for using our app.\n");
+        // Reset the text color to default (you may want to do this after printing colored text)
+        SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+        exit(0);
+    default:
+        printf("");
+        HANDLE hConsole1 = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(hConsole1, FOREGROUND_RED | FOREGROUND_INTENSITY);
+        printf("Invalid choice. Please try again.\n");
+        // Reset the text color to default (you may want to do this after printing colored text)
+        SetConsoleTextAttribute(hConsole1, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
     return 0;
 }
-
+}
+/* ___________________________________
+        Functions starts
+    ___________________________________
+*/
 void readCity(FILE *fp,struct node *c)
 {
     fscanf(fp,"%s",c->data.cityName);
@@ -321,4 +377,119 @@ void Dijkstra(int Graph[MAX][MAX], int n, int start,struct node *city)
     {
       printf("\nDistance from %s to %s : %d",city[start].data.cityName,city[i].data.cityName, distance[i]);
     }
+}
+
+// Function to merge two subarrays of struct node arr[]
+// First subarray is arr[l..m]
+// Second subarray is arr[m+1..r]
+void merge(struct node arr[], int l, int m, int r,int (*cmp)(const struct node *, const struct node *))
+{
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    // Create temporary arrays
+    struct node L[n1], R[n2];
+
+    // Copy data to temporary arrays L[] and R[]
+    for (i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[m + 1 + j];
+
+    // Merge the temporary arrays back into arr[l..r]
+    i = 0;
+    j = 0;
+    k = l;
+    while (i < n1 && j < n2)
+    {
+        if (cmp(&L[i], &R[j]) <= 0)
+        {
+            arr[k] = L[i];
+            i++;
+        }
+        else
+        {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    // Copy the remaining elements of L[], if there are any
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    // Copy the remaining elements of R[], if there are any
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+// l is for left index and r is right index of the sub-array of arr to be sorted
+void mergeSort(struct node arr[], int l, int r,    int (*cmp)(const struct node *, const struct node *))
+{
+    if (l < r)
+        {
+        // Same as (l+r)/2, but avoids overflow for large l and r
+        int m = l + (r - l) / 2;
+
+        // Sort first and second halves
+        mergeSort(arr, l, m,cmp);
+        mergeSort(arr, m + 1, r,cmp);
+
+        // Merge the sorted halves
+        merge(arr, l, m, r,cmp);
+    }
+}
+
+
+//All the compare functions
+
+// Example comparator function to sort based on pincode
+int comparePincode(const struct node *a, const struct node *b)
+ {
+    return a->data.pincode - b->data.pincode;
+}
+
+// Example comparator function to sort based on cityName
+int compareCityName(const struct node *a, const struct node *b)
+ {
+    return strcmp(a->data.cityName, b->data.cityName);
+}
+
+// Example comparator function to sort based on population
+int comparePopulation(const struct node *a, const struct node *b)
+{
+    return a->data.population - b->data.population;
+}
+
+// Example comparator function to sort based on cityCode
+int compareCityCode(const struct node *a, const struct node *b)
+{
+    return a->data.cityCode - b->data.cityCode;
+}
+
+// Example comparator function to sort based on numHospitals
+int compareNumHospitals(const struct node *a, const struct node *b)
+{
+    return a->data.numHospitals - b->data.numHospitals;
+}
+
+// Example comparator function to sort based on numPatients
+int compareNumPatients(const struct node *a, const struct node *b)
+{
+    return a->data.numPatients - b->data.numPatients;
+}
+
+// Example comparator function to sort based on numDoctors
+int compareNumDoctors(const struct node *a, const struct node *b)
+ {
+    int ans=a->data.numDoctors - b->data.numDoctors;
+    return ans;
 }
