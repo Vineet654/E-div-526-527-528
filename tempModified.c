@@ -1,14 +1,13 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include<windows.h>
+#include<ctype.h>
 
 #define MAX_USERS 100
 #define DATABASE_FILE "user_database.txt"
 #define MAX 5
 #define INFINITY 9999
-
 
 struct info
 {
@@ -24,7 +23,6 @@ struct node
 {
     struct info data;
     int distance;
-    struct node *next;
 };
 
 // Function prototypes
@@ -37,6 +35,9 @@ int compareCityCode(const struct node *, const struct node *);
 int compareNumHospitals(const struct node *, const struct node *);
 int compareNumPatients(const struct node *, const struct node *);
 int compareNumDoctors(const struct node *, const struct node *);
+int KMPSearch(char  [], char []);
+void readFile(char* ,char  []);
+
 
 void Dijkstra(int Graph[MAX][MAX], int n, int start, struct node *city);
 
@@ -52,6 +53,13 @@ typedef struct
 
 User users[MAX_USERS];
 int numUsers = 0;
+void saveUserToFile(User );
+int userExists(char *);
+int createUser();
+int loginUser();
+
+
+
 
 void saveUserToFile(User newUser)
  {
@@ -66,7 +74,8 @@ void saveUserToFile(User newUser)
     fclose(file);
 }
 
-int userExists(char *username) {
+int userExists(char *username)
+ {
     for (int i = 0; i < numUsers; ++i)
         {
         if (strcmp(users[i].username, username) == 0) {
@@ -141,9 +150,13 @@ int loginUser()
 
 int main()
  {
-    int flag,j,num;
+    int flag,flag1;
+    int j;
+    int num;
     int sortCh;
+    char searchCity[15];
     char fname[50];
+    char content[1000];
     int (*cmp)(const struct node *, const struct node *);
     FILE *file = fopen(DATABASE_FILE, "r");
     if (file != NULL)
@@ -152,9 +165,10 @@ int main()
             numUsers++;
         fclose(file);
     }
-            /*printf("Enter File name to copy data from:");
-    scanf("%s",fname);*/
-    FILE *fp=fopen("demo.txt","r");
+
+        printf("Enter File name to copy data from:");
+    scanf("%s",fname);
+    FILE *fp=fopen(fname,"r");
     if(fp==NULL)
     {
         perror("File open unsuccessful");
@@ -168,13 +182,7 @@ int main()
     for(int j=0;j<num;j++)
             readCity(fp,&city[j]);
 fclose(fp);
-struct node temp;
-temp=city[1];
-city[1]=city[3];
-city[3]=temp;
-temp=city[0];
-city[0]=city[4];
-city[4]=temp;
+
     int choice, choice2;
     while (1&&flag!=1)
     {
@@ -196,14 +204,15 @@ switch (choice)
 
         while (flag == 1)
         {
+            printf("\n----------------------------------------------------\n");
             printf("\n1--display the details\n"); //done
             printf("2--Find shortest path\n");     //dijstra`s algorithm
             printf("3--Find minimum distance to cover different cities from a city\n"); //kruskal
             printf("4--Sort cities.\n");                                               // insertion or selection sort
-            printf("5--Logout\n");
-            //code of menu driven in ksrtc..!!
+            printf("5--Search whether your city appears in health camp plan.\n");
+            printf("6--Logout\n");
 
-            printf("\nEnter your choice\n");
+           printf("\nEnter your choice\n");
             scanf("%d", &choice2);
             switch (choice2)
             {
@@ -265,6 +274,31 @@ switch (choice)
                     mergeSort(city, 0, num - 1,cmp);
                     break;
                 case 5:
+                    printf("Enter city name to search:");
+                    scanf("%s",searchCity);
+                    readFile(fname,content);
+                    flag1=KMPSearch(searchCity,content);
+                    if(flag1==1)
+                    {
+                                    const WORD darkGreen = 2;
+                        // Get the handle to the console
+                        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+                        SetConsoleTextAttribute(hConsole,darkGreen| FOREGROUND_INTENSITY);
+                        printf("Yes, your city is in health camp plan.\n");
+                        // Reset the text color to default (you may want to do this after printing colored text)
+                        SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+                    }
+                    else
+                    {
+                            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+                        SetConsoleTextAttribute(hConsole,FOREGROUND_RED| FOREGROUND_INTENSITY);
+                        printf("No, your city does n't appear in health camp plan.\n");
+                        // Reset the text color to default (you may want to do this after printing colored text)
+                        SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+                    }
+                    break;
+
+                case 6:
                     printf("");
                     const WORD darkGreen = 2;
                     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -298,8 +332,8 @@ switch (choice)
         // Reset the text color to default (you may want to do this after printing colored text)
         SetConsoleTextAttribute(hConsole1, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
-    return 0;
 }
+    return 0;
 }
 /* ___________________________________
         Functions starts
@@ -384,9 +418,13 @@ void Dijkstra(int Graph[MAX][MAX], int n, int start,struct node *city)
 // Second subarray is arr[m+1..r]
 void merge(struct node arr[], int l, int m, int r,int (*cmp)(const struct node *, const struct node *))
 {
-    int i, j, k;
-    int n1 = m - l + 1;
-    int n2 = r - m;
+    int i;
+    int j;
+    int k;
+    int n1;
+    n1 = m - l + 1;
+    int n2;
+    n2 = r - m;
 
     // Create temporary arrays
     struct node L[n1], R[n2];
@@ -424,7 +462,8 @@ void merge(struct node arr[], int l, int m, int r,int (*cmp)(const struct node *
     }
 
     // Copy the remaining elements of R[], if there are any
-    while (j < n2) {
+    while (j < n2)
+        {
         arr[k] = R[j];
         j++;
         k++;
@@ -493,3 +532,107 @@ int compareNumDoctors(const struct node *a, const struct node *b)
     int ans=a->data.numDoctors - b->data.numDoctors;
     return ans;
 }
+
+void computeLPSArray(char pat[], int M, int lps [])
+{
+    int len = 0;
+    int i = 1;
+    lps[0] = 0;
+
+    while (i < M)
+    {
+        if (pat[i] == pat[len])
+        {
+            len++;
+            lps[i] = len;
+            i++;
+        }
+        else
+        {
+            if (len != 0)
+            {
+                len = lps[len - 1];
+            }
+            else
+            {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+}
+
+int KMPSearch(char pat [], char txt[])
+{
+    int M = strlen(pat);
+    int N = strlen(txt);
+
+    int lps[M];
+    computeLPSArray(pat, M, lps);
+
+    int i = 0;
+    int j = 0;
+    while (i < N)
+    {
+        if (tolower(pat[j]) == tolower(txt[i]))
+        {
+            j++;
+            i++;
+        }
+
+        if (j == M)
+        {
+            return 1;
+            j = lps[j - 1];
+        }
+        else if (i < N && pat[j] != txt[i])
+        {
+            if (j != 0)
+            {
+                j = lps[j - 1];
+            }
+            else
+            {
+                i = i + 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// Function to read file content and print it
+void readFile(char fname [],char content [])
+{
+    long fileSize;
+    // Open the file for reading
+     FILE * fp = fopen(fname, "r");
+
+    if (fp == NULL)
+        {
+        perror("Error opening file");
+        return; // Return without printing if there's an error
+    }
+
+    // Determine the file size
+    fseek(fp, 0, SEEK_END);
+    fileSize = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    // Ensure the file size does not exceed the capacity of the content array
+    if (fileSize >= 1000)
+        {
+        fclose(fp);
+        printf("File is too large for the program to handle.\n");
+        return; // Return without printing if the file is too large
+    }
+
+    // Read the file content
+    fread(content, 1, fileSize, fp);
+
+    // Add a null terminator at the end of the string
+    content[fileSize] = '\0';
+
+    // Close the file
+    fclose(fp);
+}
+
