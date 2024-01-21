@@ -155,6 +155,7 @@ int main()
     int num;
     int sortCh;
     char searchCity[15];
+    char gfname[50];
     char fname[50];
     char content[1000];
     int (*cmp)(const struct node *, const struct node *);
@@ -223,9 +224,9 @@ switch (choice)
                     break;
                 case 2:
                     printf("Enter graph file: ");
-                    scanf("%s", fname);
+                    scanf("%s", gfname);
                     int graph[5][5];
-                    FILE *fp2 = fopen(fname, "r");
+                    FILE *fp2 = fopen(gfname, "r");
                     for (int i = 0; i < 5; i++)
                     {
                         for (int j = 0; j < 5; j++)
