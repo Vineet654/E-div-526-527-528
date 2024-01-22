@@ -498,6 +498,7 @@ void Dijkstra(int Graph[MAX][MAX], int n, int start,struct node *city)
         }
     count++;
   }
+  mergeSort(city,0,9,compareCityCode);
 
   // Printing the distance
   for (i = 0; i < n; i++)
