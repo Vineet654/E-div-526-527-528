@@ -253,10 +253,11 @@ switch (choice)
             printf("3--Find minimum distance to cover different cities from a city\n"); //kruskal
             printf("4--Sort cities.\n");                                               // insertion or selection sort
             printf("5--Search whether your city appears in health camp plan.\n");
-            printf("6--Display City With Lowest Hospitals\n");
-            printf("7--Avl trees\n");
-            printf("8--Display City With Highest Patients\n");
-            printf("9--Logout\n");
+            printf("6--Display city with highest number of  hospitals");
+            printf("7--Display City With Lowest number of Hospitals\n");
+            printf("8--Avl trees\n");
+            printf("9--Display City With Highest Patients\n");
+            printf("10--Logout\n");
 
            printf("\nEnter your choice\n");
             scanf("%d", &choice2);
@@ -359,11 +360,13 @@ switch (choice)
                         SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
                     }
                     break;
+                case 6: displayCityWithHighestHospitals(city,num);
+                            break;
 
-                case 6 : displayCityWithLowestHospitals(city, num);
+                case 7 : displayCityWithLowestHospitals(city, num);
                          break;
 
-                case 7 :  avlTreeRoot = createAVLTree(city, num);
+                case 8 :  avlTreeRoot = createAVLTree(city, num);
 
                             printf("Which Type of traversal You want\n");
                             printf("1.PreOrder\n");
@@ -387,12 +390,10 @@ switch (choice)
                              }
                             break;
 
-                case 8 :  displayCityWithHighestPatients(city, num);
+                case 9:  displayCityWithHighestPatients(city, num);
                          break;
 
-    return 0;
-
-                case 9:
+                case 10:
                     printf("");
                     const WORD darkGreen = 2;
                     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -756,29 +757,6 @@ void displayCityWithLowestHospitals(struct node *cities, int numCities)
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
-void displayCityWithHighestPatients(struct node *cities, int numCities)
-{
-    int maxPatients = cities[0].data.numPatients;
-    int maxIndex = 0;
-
-    // Find the city with the highest number of hospitals
-    for (int i = 1; i < numCities; ++i) {
-        if (cities[i].data.numPatients > maxPatients) {
-            maxPatients = cities[i].data.numPatients;
-            maxIndex = i;
-        }
-    }
-
-    const WORD lightGreenBackground = BACKGROUND_GREEN | BACKGROUND_INTENSITY;
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, lightGreenBackground);
-
-    // Display the city with the highest number of patients:
-    printf("City with the highest number of patients:\n");
-    displayCity(&cities[maxIndex]);
-
-    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-}
 
 //............................................
 struct bstNode* createAVLTree(struct node cities[], int numCities)
@@ -819,7 +797,8 @@ struct bstNode* insertAVL(struct bstNode* root, struct node city)
     int balance = getBalance(root);
 
     // Left Heavy
-    if (balance > 1) {
+    if (balance > 1)
+        {
         if (strcmp(city.data.cityName, root->left->cityName) < 0)
             return rightRotate(root);
         else if (strcmp(city.data.cityName, root->left->cityName) > 0) {
@@ -829,7 +808,8 @@ struct bstNode* insertAVL(struct bstNode* root, struct node city)
     }
 
     // Right Heavy
-    if (balance < -1) {
+    if (balance < -1)
+        {
         if (strcmp(city.data.cityName, root->right->cityName) > 0)
             return leftRotate(root);
         else if (strcmp(city.data.cityName, root->right->cityName) < 0) {
@@ -1137,4 +1117,83 @@ void kruskalAlgo(int n, int edge[n][3])
         }
 
     printf("Minimum Cost Spanning Tree: %d\n", minCost);
+}
+
+
+void displayCityWithHighestHospitals(struct node *cities, int numCities)
+ {
+    int maxHospitals = cities[0].data.numHospitals;
+    int maxIndex = 0;
+
+    // Find the city with the lowest number of hospitals
+    for (int i = 1; i < numCities; ++i)
+        {
+        if (cities[i].data.numHospitals > maxHospitals)
+         {
+            maxHospitals = cities[i].data.numHospitals;
+            maxIndex = i;
+        }
+    }
+
+          const WORD lightRedBackground = BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+          HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+          SetConsoleTextAttribute(hConsole, lightRedBackground);
+
+
+    // Display the city with the lowest number of hospitals
+    printf("City with the highest number of hospitals:\n");
+    displayCity(&cities[maxIndex]);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
+
+void displayCityWithHighestPatients(struct node *cities, int numCities)
+{
+    int maxPatients = cities[0].data.numPatients;
+    int maxIndex = 0;
+
+    // Find the city with the highest number of hospitals
+    for (int i = 1; i < numCities; ++i) {
+        if (cities[i].data.numPatients > maxPatients) {
+            maxPatients = cities[i].data.numPatients;
+            maxIndex = i;
+        }
+    }
+
+    const WORD lightGreenBackground = BACKGROUND_RED | BACKGROUND_INTENSITY;
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, lightGreenBackground);
+
+    // Display the city with the highest number of patients:
+    printf("City with the highest number of patients:\n");
+    displayCity(&cities[maxIndex]);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
+
+
+void displayCityWithLowestPatients(struct node *cities, int numCities)
+{
+    int minPatients = cities[0].data.numPatients;
+    int minIndex = 0;
+
+    // Find the city with the highest number of hospitals
+    for (int i = 1; i < numCities; ++i)
+     {
+        if (cities[i].data.numPatients < minPatients)
+            {
+            minPatients = cities[i].data.numPatients;
+            minIndex = i;
+        }
+    }
+
+    const WORD lightGreenBackground = BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, lightGreenBackground);
+
+    // Display the city with the highest number of patients:
+    printf("City with the highest number of patients:\n");
+    displayCity(&cities[minIndex]);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
