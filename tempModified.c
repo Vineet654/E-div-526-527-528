@@ -416,10 +416,12 @@ void Dijkstra(int Graph[MAX][MAX], int n, int start,struct node *city)
     count++;
   }
 
+  mergeSort(city, 0, n - 1,compareCityCode);
   // Printing the distance
   for (i = 0; i < n; i++)
     if (i != start)
     {
+
       printf("\nDistance from %s to %s : %d",city[start].data.cityName,city[i].data.cityName, distance[i]);
     }
 }
@@ -712,8 +714,7 @@ void kruskalAlgo(int n, int edge[n][3])
     // To store the minimun cost
     int minCost = 0;
 
-    printf(
-        "Following are the edges in the constructed MST\n");
+    printf("Following are the edges in the constructed MST\n");
     for (int i = 0; i < n; i++) {
         int v1 = findParent(parent, edge[i][0]);
         int v2 = findParent(parent, edge[i][1]);
