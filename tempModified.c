@@ -961,7 +961,7 @@ void iterativePreOrder(struct bstNode* root)
         while (current != NULL)
         {
             printf("%s ", current->cityName);
-             if(stack->top != NULL)
+             if( current != NULL || stack->top != NULL)
             {
                 printf("-->  ");
             }
@@ -980,23 +980,25 @@ void iterativePreOrder(struct bstNode* root)
 
 void iterativeInOrder(struct bstNode* root)
  {
-    if (root == NULL) {
+    if (root == NULL)
+        {
         return;
     }
 
     struct Stack* stack = createStack();
-    struct Stack* stack2 = createStack();
     struct bstNode* current = root;
 
-    while (current != NULL || stack->top != NULL) {
-        while (current != NULL) {
+    while (current != NULL || stack->top != NULL)
+        {
+        while (current != NULL)
+         {
             push(stack, current);
             current = current->left;
         }
 
         current = pop(stack);
         printf("%s ", current->cityName);
-         if(stack2->top != NULL)
+         if(current != NULL || stack->top != NULL)
             {
                 printf("-->  ");
             }
@@ -1082,13 +1084,16 @@ void unionSet(int u, int v, int parent[], int rank[], int n)
     u = findParent(parent, u);
     v = findParent(parent, v);
 
-    if (rank[u] < rank[v]) {
+    if (rank[u] < rank[v])
+        {
         parent[u] = v;
-    }
-    else if (rank[u] > rank[v]) {
+        }
+    else if (rank[u] > rank[v])
+     {
         parent[v] = u;
     }
-    else {
+    else
+    {
         parent[v] = u;
 
         // Since the rank increases if
@@ -1113,7 +1118,8 @@ void kruskalAlgo(int n, int edge[n][3])
     int minCost = 0;
 
     printf("Following are the edges in the constructed MST\n");
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+        {
         int v1 = findParent(parent, edge[i][0]);
         int v2 = findParent(parent, edge[i][1]);
         int wt = edge[i][2];
@@ -1121,13 +1127,14 @@ void kruskalAlgo(int n, int edge[n][3])
         // If the parents are different that
         // means they are in different sets so
         // union them
-        if (v1 != v2) {
+        if (v1 != v2)
+            {
             unionSet(v1, v2, parent, rank, n);
             minCost += wt;
             printf("%d -- %d == %d\n", edge[i][0],
                    edge[i][1], wt);
+            }
         }
-    }
 
     printf("Minimum Cost Spanning Tree: %d\n", minCost);
 }
