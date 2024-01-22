@@ -253,11 +253,12 @@ switch (choice)
             printf("3--Find minimum distance to cover different cities from a city\n"); //kruskal
             printf("4--Sort cities.\n");                                               // insertion or selection sort
             printf("5--Search whether your city appears in health camp plan.\n");
-            printf("6--Display city with highest number of  hospitals");
+            printf("6--Display city with highest number of  hospitals\n");
             printf("7--Display City With Lowest number of Hospitals\n");
             printf("8--Avl trees\n");
             printf("9--Display City With Highest Patients\n");
-            printf("10--Logout\n");
+            printf("10--Display city with Lowest patients.\n");
+            printf("11--Logout\n");
 
            printf("\nEnter your choice\n");
             scanf("%d", &choice2);
@@ -393,7 +394,9 @@ switch (choice)
                 case 9:  displayCityWithHighestPatients(city, num);
                          break;
 
-                case 10:
+                case 10: displayCityWithLowestPatients(city,num);
+                        break;
+                case 11:
                     printf("");
                     const WORD darkGreen = 2;
                     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
