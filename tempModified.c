@@ -45,6 +45,23 @@ struct Stack
 {
     struct StackNode* top;
 };
+struct Node1
+{
+    int value;
+    struct Node *next;
+};
+
+struct SparseTable
+{
+    int size;
+    struct Node1 **table;
+};
+
+struct City1
+{
+    char name[50];
+    int population;
+};
 
 // Function prototypes
 
@@ -62,7 +79,7 @@ void readFile(char* ,char  []);
 struct bstNode* searchCityAVL(struct bstNode* root, const char cityName[]);
 void displayCityWithLowestHospitals(struct node *cities, int numCities);
 void displayCityWithHighestPatients(struct node *cities, int numCities);
-
+struct SparseTable *initializeSparseTable(int size);
 
 //.............................
 
@@ -195,6 +212,8 @@ int main()
     char gfname[50];
     char fname[50];
     char content[1000];
+    int minPopulation;
+    int maxPopulation;
     int (*cmp)(const struct node *, const struct node *);
     FILE *file = fopen(DATABASE_FILE, "r");
     if (file != NULL)
@@ -258,7 +277,8 @@ switch (choice)
             printf("8--Avl trees\n");
             printf("9--Display City With Highest Patients\n");
             printf("10--Display city with Lowest patients.\n");
-            printf("11--Logout\n");
+            printf("11--Display All the cities given in a range of Popultion\n");
+            printf("12--Logout\n");
 
            printf("\nEnter your choice\n");
             scanf("%d", &choice2);
@@ -396,7 +416,29 @@ switch (choice)
 
                 case 10: displayCityWithLowestPatients(city,num);
                         break;
-                case 11:
+                case 11 :
+                            printf("Enter the minimum population: ");
+                            scanf("%d", &minPopulation);
+                            printf("Enter the maximum population: ");
+                            scanf("%d", &maxPopulation);
+
+                            // Initialization of  a sparse table
+                            struct SparseTable *sparseTable = initializeSparseTable(maxPopulation + 1);
+
+                            // Insert city indices into the sparse table based on their populations
+                            for (int i = 0; i < num; ++i)
+                            {
+                                insertValue(sparseTable, city[i].data.population, i);
+                            }
+
+                            // Display cities in the specified population range
+                            displayCitiesInRange(sparseTable, city, num, minPopulation, maxPopulation);
+
+                            // Clean up: Free allocated memory
+                            freeSparseTable(sparseTable);
+                            break;
+
+                case 12:
                     printf("");
                     const WORD darkGreen = 2;
                     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -1199,4 +1241,71 @@ void displayCityWithLowestPatients(struct node *cities, int numCities)
     displayCity(&cities[minIndex]);
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
+
+void freeSparseTable(struct SparseTable *sparseTable)
+{
+    for (int i = 0; i < sparseTable->size; ++i)
+    {
+        struct Node1 *current = sparseTable->table[i];
+        while (current != NULL)
+        {
+            struct Node1 *temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+    free(sparseTable->table);
+    free(sparseTable);
+}
+
+struct SparseTable *initializeSparseTable(int size)
+{
+    struct SparseTable *sparseTable = (struct SparseTable *)malloc(sizeof(struct SparseTable));
+    sparseTable->size = size;
+    sparseTable->table = (struct Node1 **)malloc(size * sizeof(struct Node1 *));
+
+    // Initialize each entry in the sparse table to NULL
+    for (int i = 0; i < size; ++i)
+    {
+        sparseTable->table[i] = NULL;
+    }
+
+    return sparseTable;
+}
+
+// Function to insert a value into the sparse table
+void insertValue(struct SparseTable *sparseTable, int population, int value)
+{
+    int hash = population % sparseTable->size;
+
+    // Create a new node
+    struct Node1 *newNode = (struct Node1 *)malloc(sizeof(struct Node1));
+    newNode->value = value;
+    newNode->next = sparseTable->table[hash];
+    sparseTable->table[hash] = newNode;
+}
+
+// Function to perform a range query using sparse table
+void displayCitiesInRange(struct SparseTable *sparseTable, struct node cities[], int numCities, int minPopulation, int maxPopulation)
+{
+    printf("Cities in the population range [%d, %d]:\n", minPopulation, maxPopulation);
+
+    // Iterate over the specified population range
+    for (int i = minPopulation; i <= maxPopulation; ++i)
+    {
+        int hash = i % sparseTable->size;
+        struct Node1 *current = sparseTable->table[hash];
+
+        // Traverse the linked list at the current hash index
+        while (current != NULL)
+        {
+            int cityIndex = current->value;
+            if (cityIndex >= 0 && cityIndex < numCities && cities[cityIndex].data.population >= minPopulation && cities[cityIndex].data.population <= maxPopulation)
+            {
+                printf("%s (Population: %d)\n", cities[cityIndex].data.cityName, cities[cityIndex].data.population);
+            }
+            current = current->next;
+        }
+    }
 }
