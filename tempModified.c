@@ -6,7 +6,7 @@
 
 #define MAX_USERS 100
 #define DATABASE_FILE "user_database.txt"
-#define MAX 5
+#define MAX 10
 #define INFINITY 9999
 
 struct info
@@ -169,7 +169,7 @@ int main()
 
         printf("Enter File name to copy data from:");
     scanf("%s",fname);
-    FILE *fp=fopen(fname,"r");
+    FILE *fp = fopen(fname,"r");
     if(fp==NULL)
     {
         perror("File open unsuccessful");
@@ -207,9 +207,9 @@ switch (choice)
         {
             printf("\n----------------------------------------------------\n");
             printf("\n1--display the details\n"); //done
-            printf("2--Find shortest path\n");     //dijstra`s algorithm
+            printf("2--Find shortest path\n");     //dijkstra`s algorithm
             printf("3--Find minimum distance to cover different cities from a city\n"); //kruskal
-            printf("4--Sort cities.\n");                                               // insertion or selection sort
+            printf("4--Sort cities.\n");                                               // merge sort
             printf("5--Search whether your city appears in health camp plan.\n");
             printf("6--Logout\n");
 
@@ -225,30 +225,30 @@ switch (choice)
                 case 2:
                     printf("Enter graph file: ");
                     scanf("%s", gfname);
-                    int graph[5][5];
+                    int graph[10][10];
                     FILE *fp2 = fopen(gfname, "r");
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 0; i < 10; i++)
                     {
-                        for (int j = 0; j < 5; j++)
+                        for (int j = 0; j < 10; j++)
                             fscanf(fp2, "%d", &graph[i][j]);
                     }
                     fclose(fp2);
                     printf("Enter the source node\n");
                     int source;
                     scanf("%d", &source);
-                    Dijkstra(graph, 5, source, city);
+                    Dijkstra(graph, 10, source, city);
                     break;
                 case 3: printf("Enter graph file: ");
                     scanf("%s", gfname);
                     FILE *fp3 = fopen(gfname, "r");
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 0; i < 10; i++)
                     {
-                        for (int j = 0; j < 5; j++)
-                            fscanf(fp2, "%d", &graph[i][j]);
+                        for (int j = 0; j < 10; j++)
+                            fscanf(fp3, "%d", &graph[i][j]);
                     }
-                    fclose(fp2);
+                    fclose(fp3);
 
-                    kruskalAlgo(5, graph);
+                    kruskalAlgo(10, graph);
                     break;
                 case 4:
                     printf("Sort cities based on:\n");
@@ -698,7 +698,6 @@ void unionSet(int u, int v, int parent[], int rank[], int n)
     }
 }
 
-// Function to find the MST
 void kruskalAlgo(int n, int edge[n][3])
 {
     // First we sort the edge array in ascending order
