@@ -27,7 +27,8 @@ struct node
     int distance;
 };
 
-struct bstNode {
+struct bstNode
+{
     char cityName[50];
     int population;
     struct bstNode* left;
@@ -74,11 +75,19 @@ int compareCityCode(const struct node *, const struct node *);
 int compareNumHospitals(const struct node *, const struct node *);
 int compareNumPatients(const struct node *, const struct node *);
 int compareNumDoctors(const struct node *, const struct node *);
+void kruskalAlgo(int n, int edge[][3]);
 int KMPSearch(char  [], char []);
 void readFile(char* ,char  []);
 struct bstNode* searchCityAVL(struct bstNode* root, const char cityName[]);
-void displayCityWithLowestHospitals(struct node *cities, int numCities);
-void displayCityWithHighestPatients(struct node *cities, int numCities);
+void displayCityWithLowestHospitals(struct node *, int );
+void displayCityWithHighestPatients(struct node *, int );
+void displayCityWithLowestPatients(struct node *, int );
+void displayCityWithHighestHospitals(struct node *,int);
+void iterativePreOrder(struct bstNode* root);
+void iterativeInOrder(struct bstNode* root);
+void iterativePostOrder(struct bstNode* root);
+
+
 struct SparseTable *initializeSparseTable(int size);
 
 //.............................
@@ -114,10 +123,11 @@ int loginUser();
 void saveUserToFile(User newUser)
  {
     FILE *file = fopen(DATABASE_FILE, "a");
-    if (file == NULL) {
+    if (file == NULL)
+        {
         perror("Error opening file");
         exit(0);
-    }
+        }
 
     fprintf(file, "%s %s\n", newUser.username, newUser.password);
 
@@ -128,7 +138,8 @@ int userExists(char *username)
  {
     for (int i = 0; i < numUsers; ++i)
         {
-        if (strcmp(users[i].username, username) == 0) {
+        if (strcmp(users[i].username, username) == 0)
+            {
             return 1; // User exists
         }
     }
@@ -310,15 +321,16 @@ switch (choice)
 
                 case 3: printf("Enter graph file: ");
                     scanf("%s", gfname);
+                    int graph3[50][3];
                     FILE *fp3 = fopen(gfname, "r");
-                    for (int i = 0; i < 10; i++)
+                    for (int i = 0; i < 45; i++)
                     {
-                        for (int j = 0; j < 10; j++)
-                            fscanf(fp3, "%d", &graph[i][j]);
+                        for (int j = 0; j < 3; j++)
+                            fscanf(fp3, "%d", &graph3[i][j]);
                     }
                     fclose(fp3);
 
-                    kruskalAlgo(10, graph);
+                    kruskalAlgo(45, graph3);
                     break;
 
                 case 4:
@@ -530,7 +542,8 @@ void Dijkstra(int Graph[MAX][MAX], int n, int start,struct node *city)
     mindistance = INFINITY;
 
     for (i = 0; i < n; i++)
-      if (distance[i] < mindistance && !visited[i]) {
+      if (distance[i] < mindistance && !visited[i])
+        {
         mindistance = distance[i];
         nextnode = i;
       }
@@ -538,10 +551,11 @@ void Dijkstra(int Graph[MAX][MAX], int n, int start,struct node *city)
     visited[nextnode] = 1;
     for (i = 0; i < n; i++)
       if (!visited[i])
-        if (mindistance + cost[nextnode][i] < distance[i]) {
+        if (mindistance + cost[nextnode][i] < distance[i])
+            {
           distance[i] = mindistance + cost[nextnode][i];
           pred[i] = nextnode;
-        }
+            }
     count++;
   }
   mergeSort(city,0,9,compareCityCode);
@@ -1127,7 +1141,7 @@ void unionSet(int u, int v, int parent[], int rank[], int n)
     }
 }
 
-void kruskalAlgo(int n, int edge[n][3])
+void kruskalAlgo(int n, int edge[45][3])
 {
     // First we sort the edge array in ascending order
     // so that we can access minimum distances/cost
