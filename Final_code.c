@@ -89,7 +89,8 @@ void iterativePostOrder(struct bstNode* root);
 void displayCityWithHighestPopulation(struct node *cities, int numCities);
 void displayCityWithLowestPopulation(struct node *cities, int numCities);
 void displayPatientToHospitalRatio(struct node *city, int num);
-
+struct bstNode* deleteTreeCity(struct bstNode* root, const char cityName[]);
+struct bstNode* findMinNode(struct bstNode* node) ;
 
 struct SparseTable *initializeSparseTable(int size);
 
@@ -228,6 +229,7 @@ int main()
     char gfname[50];
     char fname[50];
     char content[1000];
+    char dcity[50];
     int minPopulation;
     int maxPopulation;
     int (*cmp)(const struct node *, const struct node *);
@@ -416,6 +418,7 @@ switch (choice)
                             printf("1.PreOrder\n");
                             printf("2.InOrder\n");
                             printf("3.PostOrder\n");
+                            printf("4.Delete City \n");
                             scanf("%d",&traversal);
                             if(traversal==1)
                             {
@@ -431,6 +434,13 @@ switch (choice)
                              {
                                  iterativePostOrder(avlTreeRoot);
                                      printf("\n");
+                             }
+                             else if (traversal == 4)
+                             {
+                                 printf("Enter city name :");
+                                 scanf("%s",dcity);
+                                 avlTreeRoot=deleteTreeCity(avlTreeRoot,dcity);
+                                iterativeInOrder(avlTreeRoot);
                              }
                             break;
 
@@ -1467,4 +1477,92 @@ void displayCityWithLowestPopulation(struct node *cities, int numCities)
     displayCity(&cities[minIndex]);
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
+
+
+struct bstNode* deleteTreeCity(struct bstNode* root, const char cityName[])
+ {
+    if (root == NULL)
+        {
+        return root; // City not found, return the original root
+        }
+
+    int cmpResult = strcmp(cityName, root->cityName);
+
+    if (cmpResult < 0)
+    {
+        root->left = deleteTreeCity(root->left, cityName);
+    }
+    else if (cmpResult > 0)
+     {
+        root->right = deleteTreeCity(root->right, cityName);
+    }
+     else
+        {
+        // Node with the cityName found, perform deletion
+
+        // Node with only one child or no child
+                if (root->left == NULL)
+                    {
+                        struct bstNode* temp = root->right;
+                        free(root);
+                        return temp;
+                    }
+                    else if (root->right == NULL)
+                        {
+                            struct bstNode* temp = root->left;
+                            free(root);
+                            return temp;
+                        }
+
+        // Node with two children, get the inorder successor (smallest in the right subtree)
+        struct bstNode* temp = findMinNode(root->right);
+
+        // Copy the inorder successor's data to this node
+        strcpy(root->cityName, temp->cityName);
+        root->population = temp->population;
+
+        // Delete the inorder successor
+        root->right = deleteTreeCity(root->right, temp->cityName);
+    }
+
+    // Update height of the current node
+    root->height = 1 + maxof(height(root->left), height(root->right));
+
+    // Get the balance factor and perform rotations if needed
+    int balance = getBalance(root);
+
+    // Left Heavy
+    if (balance > 1)
+        {
+        if (getBalance(root->left) >= 0)
+            return rightRotate(root);
+        else {
+            root->left = leftRotate(root->left);
+            return rightRotate(root);
+        }
+    }
+
+    // Right Heavy
+    if (balance < -1)
+        {
+        if (getBalance(root->right) <= 0)
+            return leftRotate(root);
+        else
+        {
+            root->right = rightRotate(root->right);
+            return leftRotate(root);
+        }
+    }
+    return root;
+}
+struct bstNode* findMinNode(struct bstNode* node)
+{
+    struct bstNode* current = node;
+
+    // Find the leftmost leaf node
+    while (current->left != NULL)
+        current = current->left;
+
+    return current;
 }
