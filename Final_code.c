@@ -105,7 +105,7 @@ struct bstNode* rightRotate(struct bstNode* y);
 struct bstNode* leftRotate(struct bstNode* x);
 void preOrder(struct bstNode* root);
 
-//........................
+//.............
 void Dijkstra(int Graph[MAX][MAX], int n, int start, struct node *city);
 void merge(struct node arr[], int l, int m, int r, int (*cmp)(const struct node *, const struct node *));
 void mergeSort(struct node arr[], int l, int r, int (*cmp)(const struct node *, const struct node *));
@@ -116,6 +116,7 @@ typedef struct
     char password[30];
 } User;
 
+
 User users[MAX_USERS];
 int numUsers = 0;
 void saveUserToFile(User );
@@ -125,6 +126,7 @@ int loginUser();
 
 void saveUserToFile(User newUser)
  {
+
     FILE *file = fopen(DATABASE_FILE, "a");
     if (file == NULL)
         {
@@ -283,7 +285,7 @@ switch (choice)
             printf("\n----------------------------------------------------\n");
             printf("\n1--display the details\n"); //done
             printf("2--Find shortest path\n");     //dijstra`s algorithm
-            printf("3--Find minimum distance to cover different cities from a city\n"); //kruskal
+            printf("3--Find minimum distance covering/reaching all the cities.\n"); //kruskal
             printf("4--Sort cities.\n");                                               // insertion or selection sort
             printf("5--Search whether your city appears in health camp plan.\n");
             printf("6--Display city with highest number of  hospitals\n");
@@ -296,8 +298,8 @@ switch (choice)
             printf("13--Display Patient-to-Doctor Ratio for Each City:\n");
             printf("14--Create Health Camps Between two random cities\n");
             printf("15--Display Patient-to-Hospital Ratio for Each City:\n");
-            printf("16--Display city with Lowest population.\n");
-            printf("17--Display city with Highest population.\n");
+            printf("16--Display city with Highest population.\n");
+            printf("17--Display city with Lowest population.\n");
             printf("18--Logout\n");
 
            printf("\nEnter your choice\n");
@@ -1448,10 +1450,11 @@ void displayCityWithLowestPopulation(struct node *cities, int numCities)
 
     // Find the city with the lowest number of hospitals
     for (int i = 1; i < numCities; ++i) {
-        if (cities[i].data.population < minPopulation) {
+        if (cities[i].data.population < minPopulation)
+            {
             minPopulation = cities[i].data.population;
             minIndex = i;
-        }
+            }
     }
 
           const WORD lightRedBackground = BACKGROUND_RED | BACKGROUND_INTENSITY;
