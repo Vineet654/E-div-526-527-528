@@ -292,7 +292,8 @@ switch (choice)
             printf("12-- Calculate Total No of Hospitals\n");
             printf("13--Display Patient-to-Doctor Ratio for Each City:\n");
             printf("14--Create Health Camps Between two random cities\n");
-            printf("15--Logout\n");
+            printf("15--Display Patient-to-Hospital Ratio for Each City:\n");
+            printf("16--Logout\n");
 
            printf("\nEnter your choice\n");
             scanf("%d", &choice2);
@@ -463,12 +464,15 @@ switch (choice)
                 case 14 : createHealthCamps(city, num);
                           break;
 
+                case 15: displayPatientToHospitalRatio(city, num);
+                           break;
 
-                case 15:
+                case 16:
                     printf("");
                     const WORD darkGreen = 2;
                     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
                     SetConsoleTextAttribute(hConsole, darkGreen | FOREGROUND_INTENSITY);
+
                     printf("You are now logged out..!!\n");
                     // Reset the text color to default (you may want to do this after printing colored text)
                     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -632,7 +636,7 @@ void merge(struct node arr[], int l, int m, int r,int (*cmp)(const struct node *
 
     // Copy the remaining elements of R[], if there are any
     while (j < n2)
-        {
+    {
         arr[k] = R[j];
         j++;
         k++;
@@ -661,7 +665,7 @@ void mergeSort(struct node arr[], int l, int r,    int (*cmp)(const struct node 
 
 // Example comparator function to sort based on pincode
 int comparePincode(const struct node *a, const struct node *b)
- {
+{
     return a->data.pincode - b->data.pincode;
 }
 
@@ -1379,4 +1383,22 @@ void createHealthCamps(struct node city[], int num)
 
             printf("Health Camp created between %s and %s\n", city[cityIndex1].data.cityName, city[cityIndex2].data.cityName);
     }
+}
+
+void displayPatientToHospitalRatio(struct node *city, int num)
+ {
+    printf("Patient-to-Hospital Ratio for Each City:\n");
+
+    for (int i = 0; i < num; i++)
+      {
+        double ratio = ((double)city[i].data.numPatients) / city[i].data.numHospitals;
+        printf("%s: %.2lf\n", city[i].data.cityName, ratio);
+      }
+
+    const WORD lightGreenBackground = BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, lightGreenBackground);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+
 }
