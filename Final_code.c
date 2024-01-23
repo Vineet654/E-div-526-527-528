@@ -289,7 +289,10 @@ switch (choice)
             printf("9--Display City With Highest Patients\n");
             printf("10--Display city with Lowest patients.\n");
             printf("11--Display All the cities given in a range of Popultion\n");
-            printf("12--Logout\n");
+            printf("12-- Calculate Total No of Hospitals\n");
+            printf("13--Display Patient-to-Doctor Ratio for Each City:\n");
+            printf("14--Create Health Camps Between two random cities\n");
+            printf("15--Logout\n");
 
            printf("\nEnter your choice\n");
             scanf("%d", &choice2);
@@ -450,7 +453,18 @@ switch (choice)
                             freeSparseTable(sparseTable);
                             break;
 
-                case 12:
+                case 12 : calculateTotalHospitals(city, num);
+                            break;
+
+
+                case 13 :  displayDoctorToPatientRatio(city, num);
+                           break;
+
+                case 14 : createHealthCamps(city, num);
+                          break;
+
+
+                case 15:
                     printf("");
                     const WORD darkGreen = 2;
                     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -1321,5 +1335,48 @@ void displayCitiesInRange(struct SparseTable *sparseTable, struct node cities[],
             }
             current = current->next;
         }
+    }
+}
+void calculateTotalHospitals(struct node *city, int num)
+{
+    int totalHospitals = 0;
+
+    for (int i = 0; i < num; i++) {
+        totalHospitals = totalHospitals + city[i].data.numHospitals;
+    }
+
+    // Display the total number of hospitals
+    printf("Total number of hospitals across all cities: %d\n", totalHospitals);
+}
+
+// Function to calculate and display doctor-to-patient ratio for all cities
+void displayDoctorToPatientRatio(struct node *city, int num)
+ {
+    printf("Patient-to-Doctor Ratio for Each City:\n");
+
+    for (int i = 0; i < num; i++) {
+        double ratio = ((double)city[i].data.numPatients) / city[i].data.numDoctors;
+        printf("%s: %.2lf\n", city[i].data.cityName, ratio);
+    }
+}
+
+void createHealthCamps(struct node city[], int num)
+{
+    // Seed for random number generation
+    srand(time(NULL));
+
+    // Number of health camps to create
+    int numHealthCamps;
+    printf("Enter no of Health Camps\n");
+    scanf("%d",&numHealthCamps);
+
+    // Randomly select two distinct cities
+    for(int i=0;i<numHealthCamps;i++)
+    {
+        int cityIndex1, cityIndex2;
+        cityIndex1 = rand() % num;
+        cityIndex2 = rand() % num;
+
+            printf("Health Camp created between %s and %s\n", city[cityIndex1].data.cityName, city[cityIndex2].data.cityName);
     }
 }
