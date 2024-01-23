@@ -86,6 +86,9 @@ void displayCityWithHighestHospitals(struct node *,int);
 void iterativePreOrder(struct bstNode* root);
 void iterativeInOrder(struct bstNode* root);
 void iterativePostOrder(struct bstNode* root);
+void displayCityWithHighestPopulation(struct node *cities, int numCities);
+void displayCityWithLowestPopulation(struct node *cities, int numCities);
+void displayPatientToHospitalRatio(struct node *city, int num);
 
 
 struct SparseTable *initializeSparseTable(int size);
@@ -293,7 +296,9 @@ switch (choice)
             printf("13--Display Patient-to-Doctor Ratio for Each City:\n");
             printf("14--Create Health Camps Between two random cities\n");
             printf("15--Display Patient-to-Hospital Ratio for Each City:\n");
-            printf("16--Logout\n");
+            printf("16--Display city with Lowest population.\n");
+            printf("17--Display city with Highest population.\n");
+            printf("18--Logout\n");
 
            printf("\nEnter your choice\n");
             scanf("%d", &choice2);
@@ -467,7 +472,13 @@ switch (choice)
                 case 15: displayPatientToHospitalRatio(city, num);
                            break;
 
-                case 16:
+                 case 16:  displayCityWithHighestPopulation(city, num);
+                         break;
+
+                 case 17:  displayCityWithLowestPopulation(city, num);
+                         break;
+
+                case 18:
                     printf("");
                     const WORD darkGreen = 2;
                     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -1401,4 +1412,56 @@ void displayPatientToHospitalRatio(struct node *city, int num)
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 
+}
+
+void displayCityWithHighestPopulation(struct node *cities, int numCities)
+ {
+    int maxPopulation = cities[0].data.population;
+    int maxIndex = 0;
+
+    // Find the city with the lowest number of hospitals
+    for (int i = 1; i < numCities; ++i)
+        {
+        if (cities[i].data.population > maxPopulation)
+         {
+            maxPopulation = cities[i].data.population;
+            maxIndex = i;
+        }
+    }
+
+          const WORD lightRedBackground = BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+          HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+          SetConsoleTextAttribute(hConsole, lightRedBackground);
+
+
+    // Display the city with the lowest number of hospitals
+    printf("City with the highest population:\n");
+    displayCity(&cities[maxIndex]);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
+
+void displayCityWithLowestPopulation(struct node *cities, int numCities)
+ {
+    int minPopulation = cities[0].data.population;
+    int minIndex = 0;
+
+    // Find the city with the lowest number of hospitals
+    for (int i = 1; i < numCities; ++i) {
+        if (cities[i].data.population < minPopulation) {
+            minPopulation = cities[i].data.population;
+            minIndex = i;
+        }
+    }
+
+          const WORD lightRedBackground = BACKGROUND_RED | BACKGROUND_INTENSITY;
+          HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+          SetConsoleTextAttribute(hConsole, lightRedBackground);
+
+
+    // Display the city with the lowest number of hospitals
+    printf("City with the lowest population:\n");
+    displayCity(&cities[minIndex]);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
